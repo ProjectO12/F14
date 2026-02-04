@@ -1,0 +1,95 @@
+*{
+    box-sizing:border-box;
+    font-family:"Segoe UI",sans-serif;
+}
+
+body{
+    margin:0;
+    background:linear-gradient(180deg,#ffe9ef,#ffffff);
+}
+
+.slide{
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.card{
+    width:100%;
+    max-width:380px;
+    background:white;
+    border-radius:26px;
+    padding:34px 22px 32px;
+    text-align:center;
+    box-shadow:0 18px 40px rgba(0,0,0,.08);
+}
+
+.title{
+    color:#c94a6a;
+    font-size:1.15rem;
+    font-weight:600;
+    margin-bottom:8px;
+}
+
+.subtitle{
+    color:#777;
+    font-size:.9rem;
+    margin-bottom:26px;
+}
+
+.hug-area{
+    position:relative;
+    height:160px;
+    margin-bottom:18px;
+    user-select:none;
+}
+
+.person{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:88px;
+    height:88px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:.85rem;
+    font-weight:600;
+    transition:left .05s linear, right .05s linear, transform .2s ease;
+}
+
+.you{
+    left:0;
+    background:#c94a6a;
+    color:white;
+}
+
+.her{
+    right:0;
+    background:#ffd1dc;
+    color:#7a3447;
+}
+
+.hint{
+    color:#999;
+    font-size:.9rem;
+}
+
+.message{
+    margin-top:16px;
+    font-size:1rem;
+    line-height:1.5;
+    color:#c94a6a;
+    font-weight:600;
+    opacity:0;
+    transform:translateY(6px);
+    transition:.4s ease;
+}
+
+.message.show{
+    opacity:1;
+    transform:translateY(0);
+}

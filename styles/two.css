@@ -1,0 +1,204 @@
+*{
+    box-sizing:border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body{
+    margin:0;
+    background: linear-gradient(180deg,#ffe9ef,#ffffff);
+}
+
+.slide{
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.letter-card{
+    width:100%;
+    max-width:420px;
+    background:white;
+    border-radius:24px;
+    padding:34px 26px 32px;
+    box-shadow:0 20px 45px rgba(0,0,0,0.08);
+    text-align:left;
+}
+
+.title{
+    font-size:1.2rem;
+    color:#c94a6a;
+    margin-bottom:14px;
+    font-weight:600;
+}
+
+.letter{
+    min-height:170px;
+    font-size:1.05rem;
+    line-height:1.7;
+    color:#444;
+    white-space:pre-wrap;
+}
+
+/* button appears only after typing */
+.reply-btn{
+    margin-top:26px;
+    width:100%;
+    border:none;
+    border-radius:22px;
+    padding:12px;
+    font-size:1rem;
+    cursor:pointer;
+    background:#c94a6a;
+    color:white;
+
+    transform:scale(0.6);
+    opacity:0;
+    pointer-events:none;
+
+    transition:all 0.4s cubic-bezier(.2,.9,.2,1);
+}
+
+.reply-btn.show{
+    transform:scale(1);
+    opacity:1;
+    pointer-events:auto;
+}
+
+/* cute popper */
+.popper{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:#c94a6a;
+    color:white;
+    padding:10px 16px;
+    border-radius:20px;
+    font-size:0.9rem;
+    opacity:0;
+    transition:all 0.4s ease;
+    z-index:1000;
+}
+
+.popper.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}
+#confetti{
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+}
+
+.valentine-stepper{
+    position: fixed;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+
+    width: calc(100vw - 20px);
+    max-width: 760px;
+
+    display: flex;
+    align-items: center;
+
+    background: rgba(255,255,255,0.5);
+    backdrop-filter: blur(8px);
+
+    padding: 6px 8px;
+    border-radius: 14px;
+
+    box-sizing: border-box;
+}
+
+/* Each step auto fits */
+.step{
+    display: flex;
+    align-items: center;
+    flex: 1 1 0;
+    min-width: 0;   /* very important for mobile */
+}
+
+/* hide text on very small screens later */
+.step span{
+    margin-left: 6px;
+    margin-right: 6px;
+    font-size: 11px;
+    white-space: nowrap;
+    color: #777;
+}
+
+/* circles stay fixed size */
+.circle{
+    flex-shrink: 0;
+
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #f0b6c4;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 20px;
+    background: #fff;
+    color: #c94a6a;
+}
+
+.circle.active{
+    background: #c94a6a;
+    color: #fff;
+    border-color: #c94a6a;
+}
+
+/* bar stretches automatically */
+.bar{
+    flex: 1 1 auto;
+
+    height: 4px;
+    background: #eee;
+    border-radius: 4px;
+    overflow: hidden;
+
+    margin-right: 6px;
+}
+
+/* progress fill */
+.fill{
+    height: 100%;
+    width: 0%;
+    background: #c94a6a;
+    transition: width 0.2s linear;
+}
+
+/* last step has no bar */
+.step.last .bar{
+    display: none;
+}
+
+/* ---------- mobile tuning ---------- */
+@media (max-width: 520px){
+
+    .step span{
+        display: none;   /* icons only, very clean on phones */
+    }
+
+    .valentine-stepper{
+        padding: 6px 6px;
+    }
+
+    .circle{
+        width: 20px;
+        height: 20px;
+        font-size: 13px;
+    }
+
+    .bar{
+        margin-right: 4px;
+    }
+}
