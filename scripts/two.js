@@ -1,3 +1,120 @@
+ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAo2PlDvTAm3p_r6AxjPu9REznEaUb50pc",
+    authDomain: "project012-72667.firebaseapp.com",
+    databaseURL: "https://project012-72667-default-rtdb.firebaseio.com",
+    projectId: "project012-72667",
+    storageBucket: "project012-72667.appspot.com",
+    messagingSenderId: "1015186451511",
+    appId: "1:1015186451511:web:86adc349360eef195923b2"
+};
+
+   const steps = document.querySelectorAll("#stepper .step");
+
+    // Use local year automatically
+    const YEAR = new Date().getFullYear();
+
+    // Valentine week schedule (same order as your tracker)
+    const daySchedule = [
+        new Date(YEAR, 1, 7),  // one.html  – Rose
+        new Date(YEAR, 1, 8),  // two.html
+        new Date(YEAR, 1, 9),  // three.html
+        new Date(YEAR, 1, 10), // four.html
+        new Date(YEAR, 1, 11), // five.html
+        new Date(YEAR, 1, 12), // six.html
+        new Date(YEAR, 1, 14)  // seven.html
+    ];
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    steps.forEach((step, i) => {
+
+        const link = step.querySelector("a");
+        const circle = step.querySelector(".circle");
+
+        if(!link || !daySchedule[i]) return;
+
+        const dayDate = new Date(daySchedule[i]);
+        dayDate.setHours(0,0,0,0);
+
+        // completed day = strictly before today
+        if(dayDate <= today){
+            circle.classList.remove("disabled");
+            link.style.pointerEvents = "auto";
+            link.style.opacity = "1";
+
+        }else{
+
+            // today + future → disabled
+            link.style.pointerEvents = "none";
+            link.style.opacity = "0.35";
+            circle.classList.add("disabled");
+
+        }
+    });
+
+/*
+SET YOUR REAL DATES HERE
+(India standard Valentine week – edit if needed)
+
+0 -> Rose
+1 -> Propose
+2 -> Chocolate
+3 -> Teddy
+4 -> Promise
+5 -> Hug
+6 -> Valentine
+*/
+
+function updateStepperByTime(){
+
+    const now = new Date();
+
+    steps.forEach((step, i) => {
+
+        const circle = step.querySelector(".circle");
+        const fill   = step.querySelector(".fill");
+
+        const start = daySchedule[i];
+        const end   = daySchedule[i + 1];
+
+        // future day
+        if(now < start){
+            circle.classList.remove("active");
+            if(fill) fill.style.width = "0%";
+            return;
+        }
+
+        // completed day
+        if(end && now >= end){
+            circle.classList.add("active");
+            if(fill) fill.style.width = "100%";
+            return;
+        }
+
+        // current running day
+        if(end && now >= start && now < end){
+
+            circle.classList.add("active");
+
+            const total = end.getTime() - start.getTime();
+            const passed = now.getTime() - start.getTime();
+
+            const percent = Math.min(100, Math.max(0, (passed / total) * 100));
+
+            if(fill) fill.style.width = percent + "%";
+        }
+
+    });
+}
+
+// update every minute
+updateStepperByTime();
+setInterval(updateStepperByTime, 60000);
+
 const letterEl = document.getElementById("letter");
 const replyBtn = document.getElementById("replyBtn");
 const popper = document.getElementById("popper");
@@ -7,21 +124,26 @@ const popper = document.getElementById("popper");
 --------------------------------------- */
 
 const letterText =
-`I don’t know how to say this in a perfect way.
-But being with you makes my normal days feel softer.
+`
+Neevu achata kushalama, nenu ichata kushalamey.
+Neeku chaala vishyalu cheppali (cinema nunchi inspire aina kavithalu included)
+Kaani, naa manasu ninnu choodaganey yem cheppalo marchipothondhi. Ninnu first time kalisinappati nunchi ippati varaku naalo yenno maarpulu gamaninchanu.
+Naaku anipisthu undedhi yevarra antha time teeskoni pani paata aapukoni kavithalu raasedhi ani
+kaani ninnu choosakey telisindhi kavaithaley neekosam puttay ani.
 
-We are still just college students,
-still figuring life out…
-but I really like growing through this phase with you.
+Konchem over ga undhi kadha, matter yenti antey naaku ee love letter raayatam raavatledhey. Kaani naaku nee meedha unna feelings expresss chestha vinuko.
+Newton ey malli pudithey bhoomi kantey adhika gravity nee kallallo undhi ani chepthadey.
+Antharikshamlo chandrudi chuttu tirigey satellites ki nee gurinchi telisthey ventaney return trip ippudey ochesthaye.
+Bangaraniki pranam undi ninnu choosthey, tirigi aa bhoomilokey vellipokunda untundha?
+Inka chaala cheppali kaani, ila chepthu untey neeku alasata osthadhi adhi choosi nen alispolenu kabatti ilantivi kaavaalney inka chaaala unnay avi neeku nachavu kabatti cheppatledhu kaani nuv oo anu wikipedia laga veetikantu oka datacenter ey kattisthaney ninnu prapanchaniki parichayam chesthu.
 
-So today, I only want to ask you one small thing.
+Kani, nuv aanadham ga untey ne maaku andhariki kuda anandham ga untundhi. Ninnu aa navvulo choosthu kaalam kuda karigipothadhey. 
+Allari chesey ee charan kosam intha dooram ochina maharanini adagalanukuntondhi yenti ani antey
 
-Will you let me keep choosing you,
-even on the boring days,
-even on the stressful days,
-even when we don’t understand each other properly?
+Mee manasuloki naaku anumathi isthara?
 
-— Charan`;
+—itlu mee Charan Cherry 🍒
+`;
 
 /* -------------------------------------- */
 
@@ -31,7 +153,7 @@ function typeLetter(){
 
     if(i < letterText.length){
 
-        letterEl.textContent += letterText.charAt(i);
+        letterEl.innerHTML += letterText.charAt(i);
 
         // play soft typing sound (throttled)
         // const now = Date.now();
@@ -52,6 +174,7 @@ function typeLetter(){
 
 
 typeLetter();
+// letterEl.innerHTML = letterText;
 
 /* --------------------------------------
    CLICK → notify + popper
@@ -61,7 +184,7 @@ replyBtn.addEventListener("click", () => {
 
     showPopper();
     startConfetti();
-    // sendNotification();
+    sendWaitingFromB();
 
 });
 
@@ -188,74 +311,26 @@ function startConfetti(duration = 4500){
     requestAnimationFrame(animate);
 }
 
-const steps = document.querySelectorAll(".valentine-stepper .step");
 
-/*
-SET YOUR REAL DATES HERE
-(India standard Valentine week – edit if needed)
+/* init */
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
 
-0 -> Rose
-1 -> Propose
-2 -> Chocolate
-3 -> Teddy
-4 -> Promise
-5 -> Hug
-6 -> Valentine
-*/
+/* reference */
+const waitingRef = ref(db, "hugRoom/accepted");
 
-const daySchedule = [
-    new Date("2026-02-03T00:00:00"), // Day 1 start
-    new Date("2026-02-04T00:00:00"), // Day 2 start
-    new Date("2026-02-09T00:00:00"),
-    new Date("2026-02-10T00:00:00"),
-    new Date("2026-02-11T00:00:00"),
-    new Date("2026-02-12T00:00:00"),
-    new Date("2026-02-13T00:00:00"),
-    new Date("2026-02-14T00:00:00")  // end boundary (needed for last calc)
-];
+/* -------------------------
+   SEND from web (user B)
+-------------------------- */
 
-function updateStepperByTime(){
-
-    const now = new Date();
-
-    steps.forEach((step, i) => {
-
-        const circle = step.querySelector(".circle");
-        const fill   = step.querySelector(".fill");
-
-        const start = daySchedule[i];
-        const end   = daySchedule[i + 1];
-
-        // future day
-        if(now < start){
-            circle.classList.remove("active");
-            if(fill) fill.style.width = "0%";
-            return;
-        }
-
-        // completed day
-        if(end && now >= end){
-            circle.classList.add("active");
-            if(fill) fill.style.width = "100%";
-            return;
-        }
-
-        // current running day
-        if(end && now >= start && now < end){
-
-            circle.classList.add("active");
-
-            const total = end.getTime() - start.getTime();
-            const passed = now.getTime() - start.getTime();
-
-            const percent = Math.min(100, Math.max(0, (passed / total) * 100));
-
-            if(fill) fill.style.width = percent + "%";
-        }
-
-    });
+export function sendWaitingFromB() {
+  set(waitingRef, ""+new Date());
 }
 
-// update every minute
-updateStepperByTime();
-setInterval(updateStepperByTime, 60000);
+/* -------------------------
+   CLEAR when released
+-------------------------- */
+
+export function clearWaiting() {
+  set(waitingRef, "");
+}

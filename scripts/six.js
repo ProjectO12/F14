@@ -1,78 +1,47 @@
-const area   = document.getElementById("presenceArea");
-const dot    = document.getElementById("presenceDot");
-const hint   = document.getElementById("hint");
-const message= document.getElementById("message");
+    const steps = document.querySelectorAll("#stepper .step");
 
-/* bridge for firebase file */
-window.__presence = {
-    isHolding: false,
-    sendState: null,
-    onRemoteState: null
-};
+    // Use local year automatically
+    const YEAR = new Date().getFullYear();
 
-let myHolding = false;
-let otherHolding = false;
+    // Valentine week schedule (same order as your tracker)
+    const daySchedule = [
+        new Date(YEAR, 1, 7),  // one.html  – Rose
+        new Date(YEAR, 1, 8),  // two.html
+        new Date(YEAR, 1, 9),  // three.html
+        new Date(YEAR, 1, 10), // four.html
+        new Date(YEAR, 1, 11), // five.html
+        new Date(YEAR, 1, 12), // six.html
+        new Date(YEAR, 1, 14)  // seven.html
+    ];
 
-function startHold(){
+    const today = new Date();
+    today.setHours(0,0,0,0);
 
-    if(message.classList.contains("show")) return;
+    steps.forEach((step, i) => {
 
-    myHolding = true;
-    window.__presence.isHolding = true;
+        const link = step.querySelector("a");
+        const circle = step.querySelector(".circle");
 
-    updateUI();
-    window.__presence.sendState && window.__presence.sendState(true);
-}
+        if(!link || !daySchedule[i]) return;
 
-function stopHold(){
+        const dayDate = new Date(daySchedule[i]);
+        dayDate.setHours(0,0,0,0);
 
-    if(message.classList.contains("show")) return;
+        // completed day = strictly before today
+        if(dayDate <= today){
+            circle.classList.remove("disabled");
+            link.style.pointerEvents = "auto";
+            link.style.opacity = "1";
 
-    myHolding = false;
-    window.__presence.isHolding = false;
+        }else{
 
-    updateUI();
-    window.__presence.sendState && window.__presence.sendState(false);
-}
+            // today + future → disabled
+            link.style.pointerEvents = "none";
+            link.style.opacity = "0.35";
+            circle.classList.add("disabled");
 
-function updateUI(){
-
-    dot.classList.remove("one","both");
-
-    if(myHolding || otherHolding){
-        dot.classList.add("one");
-    }
-
-    if(myHolding && otherHolding){
-        dot.classList.remove("one");
-        dot.classList.add("both");
-
-        hint.style.display = "none";
-        message.classList.add("show");
-    }
-
-}
-
-/* called by firebase file */
-window.__presence.onRemoteState = function(isHolding){
-
-    otherHolding = isHolding;
-    updateUI();
-};
-
-
-/* input */
-area.addEventListener("mousedown", startHold);
-window.addEventListener("mouseup", stopHold);
-
-area.addEventListener("touchstart", e=>{
-    e.preventDefault();
-    startHold();
-},{passive:false});
-
-window.addEventListener("touchend", stopHold);
-
-const steps = document.querySelectorAll(".valentine-stepper .step");
+        }
+    });
 
 /*
 SET YOUR REAL DATES HERE
@@ -86,17 +55,6 @@ SET YOUR REAL DATES HERE
 5 -> Hug
 6 -> Valentine
 */
-
-const daySchedule = [
-    new Date("2026-02-03T00:00:00"), // Day 1 start
-    new Date("2026-02-04T00:00:00"), // Day 2 start
-    new Date("2026-02-09T00:00:00"),
-    new Date("2026-02-10T00:00:00"),
-    new Date("2026-02-11T00:00:00"),
-    new Date("2026-02-12T00:00:00"),
-    new Date("2026-02-13T00:00:00"),
-    new Date("2026-02-14T00:00:00")  // end boundary (needed for last calc)
-];
 
 function updateStepperByTime(){
 
@@ -143,3 +101,72 @@ function updateStepperByTime(){
 // update every minute
 updateStepperByTime();
 setInterval(updateStepperByTime, 60000);
+
+const letterEl = document.getElementById("letter");
+const replyBtn = document.getElementById("replyBtn");
+const popper = document.getElementById("popper");
+
+/* --------------------------------------
+   Your love letter (edit freely)
+--------------------------------------- */
+
+const letterText =
+`
+Neeku yeppudaina hug cheskovali anipinchina, yevaru daggara lekapoyina, nannu miss avuthunna. yedhi anipinchina neeku nen pampincehy ee app use chey
+
+Idhi nuv virtual hug ivvataniki help chesthundhi. Nuv ontari ga levu ani chepthundhi.
+
+Idhi manam idharam okay saari use chesthey vibrate avuthadhi. Anntey nenu unna ani neeku chepthadhi. Bharosa isthadhi.
+Try chesi choodu.`;
+
+/* -------------------------------------- */
+
+let i = 0;
+
+function typeLetter(){
+
+    if(i < letterText.length){
+
+        letterEl.innerHTML += letterText.charAt(i);
+
+        // play soft typing sound (throttled)
+        // const now = Date.now();
+        // if(now - lastSoundTime > 60){
+        //     typeSound.currentTime = 0;
+        //     typeSound.play().catch(()=>{});
+        //     lastSoundTime = now;
+        // }
+
+        i++;
+        setTimeout(typeLetter, 35);
+
+    }else{
+        replyBtn.classList.add("show");
+    }
+
+}
+
+
+typeLetter();
+
+/* --------------------------------------
+   CLICK → notify + popper
+--------------------------------------- */
+
+replyBtn.addEventListener("click", () => {
+
+    showPopper();
+    // sendNotification();
+
+});
+
+
+function showPopper(){
+    popper.classList.add("show");
+
+    setTimeout(()=>{
+        popper.classList.remove("show");
+    },2500);
+}
+
+

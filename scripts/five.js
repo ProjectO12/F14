@@ -1,30 +1,48 @@
-const slides = document.getElementById("slides");
-const cards  = document.querySelectorAll(".promise-card");
 
-cards.forEach((card, index)=>{
+    const steps = document.querySelectorAll("#stepper .step");
 
-    const btn  = card.querySelector(".seal");
-    const done = card.querySelector(".done");
+    // Use local year automatically
+    const YEAR = new Date().getFullYear();
 
-    btn.addEventListener("click", ()=>{
+    // Valentine week schedule (same order as your tracker)
+    const daySchedule = [
+        new Date(YEAR, 1, 7),  // one.html  – Rose
+        new Date(YEAR, 1, 8),  // two.html
+        new Date(YEAR, 1, 9),  // three.html
+        new Date(YEAR, 1, 10), // four.html
+        new Date(YEAR, 1, 11), // five.html
+        new Date(YEAR, 1, 12), // six.html
+        new Date(YEAR, 1, 14)  // seven.html
+    ];
 
-        btn.style.display = "none";
-        done.classList.add("show");
+    const today = new Date();
+    today.setHours(0,0,0,0);
 
-        // move to next promise gently
-        if(index < cards.length - 1){
-            setTimeout(()=>{
-                cards[index + 1].scrollIntoView({
-                    behavior:"smooth"
-                });
-            }, 900);
+    steps.forEach((step, i) => {
+
+        const link = step.querySelector("a");
+        const circle = step.querySelector(".circle");
+
+        if(!link || !daySchedule[i]) return;
+
+        const dayDate = new Date(daySchedule[i]);
+        dayDate.setHours(0,0,0,0);
+
+        // completed day = strictly before today
+        if(dayDate <= today){
+            circle.classList.remove("disabled");
+            link.style.pointerEvents = "auto";
+            link.style.opacity = "1";
+
+        }else{
+
+            // today + future → disabled
+            link.style.pointerEvents = "none";
+            link.style.opacity = "0.35";
+            circle.classList.add("disabled");
+
         }
-
     });
-
-});
-
-const steps = document.querySelectorAll(".valentine-stepper .step");
 
 /*
 SET YOUR REAL DATES HERE
@@ -38,17 +56,6 @@ SET YOUR REAL DATES HERE
 5 -> Hug
 6 -> Valentine
 */
-
-const daySchedule = [
-    new Date("2026-02-03T00:00:00"), // Day 1 start
-    new Date("2026-02-04T00:00:00"), // Day 2 start
-    new Date("2026-02-07T00:00:00"),
-    new Date("2026-02-10T00:00:00"),
-    new Date("2026-02-11T00:00:00"),
-    new Date("2026-02-12T00:00:00"),
-    new Date("2026-02-13T00:00:00"),
-    new Date("2026-02-14T00:00:00")  // end boundary (needed for last calc)
-];
 
 function updateStepperByTime(){
 
@@ -95,3 +102,30 @@ function updateStepperByTime(){
 // update every minute
 updateStepperByTime();
 setInterval(updateStepperByTime, 60000);
+
+
+const slides = document.getElementById("slides");
+const cards  = document.querySelectorAll(".promise-card");
+
+cards.forEach((card, index)=>{
+
+    const btn  = card.querySelector(".seal");
+    const done = card.querySelector(".done");
+
+    btn.addEventListener("click", ()=>{
+
+        btn.style.display = "none";
+        done.classList.add("show");
+
+        // move to next promise gently
+        if(index < cards.length - 1){
+            setTimeout(()=>{
+                cards[index + 1].scrollIntoView({
+                    behavior:"smooth"
+                });
+            }, 900);
+        }
+
+    });
+
+});

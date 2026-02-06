@@ -1,27 +1,47 @@
-const container = document.getElementById("slideSection");
-const chocoBg = document.getElementById("chocoBg");
+    const steps = document.querySelectorAll("#stepper .step");
 
-function updateChocolateFill(){
+    // Use local year automatically
+    const YEAR = new Date().getFullYear();
 
-    const max =
-        container.scrollHeight - container.clientHeight;
+    // Valentine week schedule (same order as your tracker)
+    const daySchedule = [
+        new Date(YEAR, 1, 7),  // one.html  – Rose
+        new Date(YEAR, 1, 8),  // two.html
+        new Date(YEAR, 1, 9),  // three.html
+        new Date(YEAR, 1, 10), // four.html
+        new Date(YEAR, 1, 11), // five.html
+        new Date(YEAR, 1, 12), // six.html
+        new Date(YEAR, 1, 14)  // seven.html
+    ];
 
-    if(max <= 0){
-        chocoBg.style.height = "0%";
-        return;
-    }
+    const today = new Date();
+    today.setHours(0,0,0,0);
 
-    const progress = container.scrollTop / max;
+    steps.forEach((step, i) => {
 
-    const percent = Math.min(100, Math.max(0, progress * 100));
+        const link = step.querySelector("a");
+        const circle = step.querySelector(".circle");
 
-    chocoBg.style.height = percent + "%";
-}
+        if(!link || !daySchedule[i]) return;
 
-container.addEventListener("scroll", updateChocolateFill);
-updateChocolateFill();
+        const dayDate = new Date(daySchedule[i]);
+        dayDate.setHours(0,0,0,0);
 
-const steps = document.querySelectorAll(".valentine-stepper .step");
+        // completed day = strictly before today
+        if(dayDate <= today){
+            circle.classList.remove("disabled");
+            link.style.pointerEvents = "auto";
+            link.style.opacity = "1";
+
+        }else{
+
+            // today + future → disabled
+            link.style.pointerEvents = "none";
+            link.style.opacity = "0.35";
+            circle.classList.add("disabled");
+
+        }
+    });
 
 /*
 SET YOUR REAL DATES HERE
@@ -35,17 +55,6 @@ SET YOUR REAL DATES HERE
 5 -> Hug
 6 -> Valentine
 */
-
-const daySchedule = [
-    new Date("2026-02-03T00:00:00"), // Day 1 start
-    new Date("2026-02-04T00:00:00"), // Day 2 start
-    new Date("2026-02-09T00:00:00"),
-    new Date("2026-02-10T00:00:00"),
-    new Date("2026-02-11T00:00:00"),
-    new Date("2026-02-12T00:00:00"),
-    new Date("2026-02-13T00:00:00"),
-    new Date("2026-02-14T00:00:00")  // end boundary (needed for last calc)
-];
 
 function updateStepperByTime(){
 
@@ -92,3 +101,26 @@ function updateStepperByTime(){
 // update every minute
 updateStepperByTime();
 setInterval(updateStepperByTime, 60000);
+
+const container = document.getElementById("slideSection");
+const chocoBg = document.getElementById("chocoBg");
+
+function updateChocolateFill(){
+
+    const max =
+        container.scrollHeight - container.clientHeight;
+
+    if(max <= 0){
+        chocoBg.style.height = "0%";
+        return;
+    }
+
+    const progress = container.scrollTop / max;
+
+    const percent = Math.min(100, Math.max(0, progress * 100));
+
+    chocoBg.style.height = percent + "%";
+}
+
+container.addEventListener("scroll", updateChocolateFill);
+updateChocolateFill();

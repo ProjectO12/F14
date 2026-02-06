@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>F14</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family: "Segoe UI", sans-serif;
+    background: linear-gradient(180deg,#f7f3ef,#ffffff);
+}
+
+.container{
+    text-align:center;
+    padding:32px 26px;
+    max-width:360px;
+}
+
+.logo{
+    font-size:2.4rem;
+    font-weight:600;
+    letter-spacing:2px;
+    color:#6a5f58;
+    margin-bottom:14px;
+}
+
+.day{
+    font-size:1rem;
+    color:#a28f82;
+    margin-bottom:10px;
+}
+
+.message{
+    font-size:1rem;
+    line-height:1.6;
+    color:#5a4e45;
+    font-weight: 600;
+    font-style: bold;
+    margin-bottom:28px;
+}
+
+button{
+    border:none;
+    padding:14px 26px;
+    border-radius:22px;
+    font-size:1rem;
+    cursor:pointer;
+    background:#c97a63;
+    color:white;
+    box-shadow:0 10px 22px rgba(0,0,0,.12);
+}
+
+button:active{
+    transform:scale(.98);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">Hey Ishu,</div>
+    <div class="day" id="dayName"></div>
+    <div class="message" id="message"></div>
+    <button id="goBtn">Open today’s surprise</button>
+</div>
+
+<script>
+
+const days = [
+    { name:"Happy Rose Day",     file:"one.html",   msg:"Neeku valentine's week antha nachadhu ani telusu, kaani neekosam ee valentine's week ki virtual wishes pampisthunnaney. Rojiki oka surprise anni baauntaay ani cheppalenu but baauntaay." },
+    { name:"Happy Propose Day",  file:"two.html",   msg:"Hamma ochesava raavemo anukunna. Ee roju antha surprise yem undadhu but choodu." 
+    },
+    { name:"Happy Chocolate Day",file:"three.html", msg:"Neeku chocolates idham anukunna kaaniiii nee antha sweet kaadhu ani odhilesa. So, virtual ga neeku chocolates isthey deniki isthano chepthanu, adhey ee roju concept. choodu" },
+    { name:"Happy Teddy Day",    file:"four.html",  msg:"Neeku nen undaga verey teddy bear ahhhh. Avasaramaaaaa ahhh ahhhh [Insert Sid Sriram Song], So neeku ee roju oka chinna surprise adhi use chesina prathi sari neetho teddy maatladuthadhi. Try chesi cheppu" },
+    { name:"Happy Promise Day",  file:"five.html",  msg:"Nen usual ga promises veyyanu kaaniii vesthey break cheyyanu, alantidhi neeku ee roju naa abhayam (haami) isthunnnanu, And I won't break" },
+    { name:"Happy Hug Day",      file:"six.html",   msg:"Almost ee week aipothondhey fast ga ne gadichipoyindhi kadhaa. EE roju anthaga cheppedhi ledhu kaani velli choodu neeku nachuthadhi. oka chinna gift." },
+    { name:"Happy Valentine’s Day", file:"seven.html", msg:"And finally, Ochesammmmmm To The Most Lovely and Kindest Women Ever. Happy Valentine's day ee roju gift yem ledhu kaani naaku nuv gift ichinattey ee roju surprise choosthey. So gooooooooooooo" }
+];
+
+// change only the year if needed
+const YEAR = new Date().getFullYear();
+
+// Valentine week dates
+const schedule = [
+    new Date(YEAR,1,7),  // Feb 7
+    new Date(YEAR,1,8),
+    new Date(YEAR,1,9),
+    new Date(YEAR,1,10),
+    new Date(YEAR,1,11),
+    new Date(YEAR,1,12),
+    new Date(YEAR,1,14)  // Feb 14 (final day)
+];
+
+function sameDay(a,b){
+    return a.getFullYear()===b.getFullYear() &&
+           a.getMonth()===b.getMonth() &&
+           a.getDate()===b.getDate();
+}
+
+const today = new Date();
+today.setHours(0,0,0,0);
+
+let index = -1;
+
+// find matching day
+for(let i=0;i<schedule.length;i++){
+    if(sameDay(today, schedule[i])){
+        index = i;
+        break;
+    }
+}
+
+// after 14th Feb → go to first day
+if(today > schedule[schedule.length-1]){
+    index = 0;
+}
+
+const dayLabel  = document.getElementById("dayName");
+const messageEl = document.getElementById("message");
+const btn       = document.getElementById("goBtn");
+
+// before week starts
+if(index === -1){
+
+    dayLabel.textContent = "Welcome";
+    messageEl.textContent =
+        "This is a small week I made only for you. Come back on our special days.";
+
+    btn.onclick = () => location.href = "one.html";
+
+}else{
+
+    dayLabel.textContent = days[index].name;
+    messageEl.textContent = days[index].msg;
+
+    btn.onclick = () => {
+        location.href = days[index].file;
+    };
+}
+
+</script>
+</body>
+</html>

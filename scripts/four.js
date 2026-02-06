@@ -1,84 +1,61 @@
-const teddyWrap = document.getElementById("teddyWrap");
-const hugFill   = document.getElementById("hugFill");
-const teddy     = teddyWrap.querySelector(".teddy");
-const message   = document.getElementById("message");
-const hint      = document.getElementById("hint");
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-let holding = false;
-let progress = 0;
-let raf = null;
+const firebaseConfig = {
+    apiKey: "AIzaSyAo2PlDvTAm3p_r6AxjPu9REznEaUb50pc",
+    authDomain: "project012-72667.firebaseapp.com",
+    databaseURL: "https://project012-72667-default-rtdb.firebaseio.com",
+    projectId: "project012-72667",
+    storageBucket: "project012-72667.appspot.com",
+    messagingSenderId: "1015186451511",
+    appId: "1:1015186451511:web:86adc349360eef195923b2"
+};
 
-const HOLD_TIME = 3000; // ms needed for full hug
+    const steps = document.querySelectorAll("#stepper .step");
 
-function startHold(){
-    if(message.classList.contains("show")) return;
+    // Use local year automatically
+    const YEAR = new Date().getFullYear();
 
-    holding = true;
-    teddy.classList.add("holding");
+    // Valentine week schedule (same order as your tracker)
+    const daySchedule = [
+        new Date(YEAR, 1, 7),  // one.html  – Rose
+        new Date(YEAR, 1, 8),  // two.html
+        new Date(YEAR, 1, 9),  // three.html
+        new Date(YEAR, 1, 10), // four.html
+        new Date(YEAR, 1, 11), // five.html
+        new Date(YEAR, 1, 12), // six.html
+        new Date(YEAR, 1, 14)  // seven.html
+    ];
 
-    let last = performance.now();
+    const today = new Date();
+    today.setHours(0,0,0,0);
 
-    function step(now){
+    steps.forEach((step, i) => {
 
-        if(!holding){
-            raf = null;
-            return;
+        const link = step.querySelector("a");
+        const circle = step.querySelector(".circle");
+
+        if(!link || !daySchedule[i]) return;
+
+        const dayDate = new Date(daySchedule[i]);
+        dayDate.setHours(0,0,0,0);
+
+        // completed day = strictly before today
+        if(dayDate <= today){
+            circle.classList.remove("disabled");
+            link.style.pointerEvents = "auto";
+            link.style.opacity = "1";
+
+        }else{
+
+            // today + future → disabled
+            link.style.pointerEvents = "none";
+            link.style.opacity = "0.35";
+            circle.classList.add("disabled");
+
         }
+    });
 
-        const delta = now - last;
-        last = now;
-
-        progress += delta;
-
-        const percent = Math.min(100, (progress / HOLD_TIME) * 100);
-        hugFill.style.height = percent + "%";
-
-        if(percent >= 100){
-            finishHug();
-            return;
-        }
-
-        raf = requestAnimationFrame(step);
-    }
-
-    raf = requestAnimationFrame(step);
-}
-
-function stopHold(){
-    if(message.classList.contains("show")) return;
-
-    holding = false;
-    teddy.classList.remove("holding");
-
-    if(raf) cancelAnimationFrame(raf);
-
-    // gently fall back
-    progress *= 0.5;
-    hugFill.style.height = (progress / HOLD_TIME) * 100 + "%";
-}
-
-function finishHug(){
-    holding = false;
-    teddy.classList.remove("holding");
-
-    hugFill.style.height = "100%";
-    hint.style.display = "none";
-    message.classList.add("show");
-}
-
-/* mouse */
-teddyWrap.addEventListener("mousedown", startHold);
-window.addEventListener("mouseup", stopHold);
-
-/* touch */
-teddyWrap.addEventListener("touchstart", e=>{
-    e.preventDefault();
-    startHold();
-},{passive:false});
-
-window.addEventListener("touchend", stopHold);
-
-const steps = document.querySelectorAll(".valentine-stepper .step");
 
 /*
 SET YOUR REAL DATES HERE
@@ -92,17 +69,6 @@ SET YOUR REAL DATES HERE
 5 -> Hug
 6 -> Valentine
 */
-
-const daySchedule = [
-    new Date("2026-02-03T00:00:00"), // Day 1 start
-    new Date("2026-02-04T00:00:00"), // Day 2 start
-    new Date("2026-02-09T00:00:00"),
-    new Date("2026-02-10T00:00:00"),
-    new Date("2026-02-11T00:00:00"),
-    new Date("2026-02-12T00:00:00"),
-    new Date("2026-02-13T00:00:00"),
-    new Date("2026-02-14T00:00:00")  // end boundary (needed for last calc)
-];
 
 function updateStepperByTime(){
 
@@ -149,3 +115,111 @@ function updateStepperByTime(){
 // update every minute
 updateStepperByTime();
 setInterval(updateStepperByTime, 60000);
+
+
+const teddyWrap = document.getElementById("teddyWrap");
+const hugFill   = document.getElementById("hugFill");
+const teddy     = teddyWrap.querySelector(".teddy");
+const message   = document.getElementById("message");
+const hint      = document.getElementById("hint");
+
+let holding = false;
+let progress = 0;
+let raf = null;
+
+const HOLD_TIME = 3000; // ms needed for full hug
+
+function startHold(){
+    if(message.classList.contains("show")) return;
+
+    holding = true;
+    teddy.classList.add("holding");
+    sendWaitingFromB();
+
+    let last = performance.now();
+
+    function step(now){
+
+        if(!holding){
+            raf = null;
+            return;
+        }
+
+        const delta = now - last;
+        last = now;
+
+        progress += delta;
+
+        const percent = Math.min(100, (progress / HOLD_TIME) * 100);
+        hugFill.style.height = percent + "%";
+
+        if(percent >= 100){
+            finishHug();
+            return;
+        }
+
+        raf = requestAnimationFrame(step);
+    }
+
+    raf = requestAnimationFrame(step);
+}
+
+function stopHold(){
+    if(message.classList.contains("show")) return;
+
+    holding = false;
+    teddy.classList.remove("holding");
+    clearWaiting();
+
+    if(raf) cancelAnimationFrame(raf);
+
+    // gently fall back
+    progress *= 0.5;
+    hugFill.style.height = (progress / HOLD_TIME) * 100 + "%";
+}
+
+function finishHug(){
+    holding = false;
+    teddy.classList.remove("holding");
+
+    hugFill.style.height = "100%";
+    hint.style.display = "none";
+    message.classList.add("show");
+}
+
+/* mouse */
+teddyWrap.addEventListener("mousedown", startHold);
+
+window.addEventListener("mouseup", stopHold);
+
+/* touch */
+teddyWrap.addEventListener("touchstart", e=>{
+    e.preventDefault();
+    startHold();
+},{passive:false});
+
+window.addEventListener("touchend", stopHold);
+
+
+/* init */
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+/* reference */
+const waitingRef = ref(db, "hugRoom/touched");
+
+/* -------------------------
+   SEND from web (user B)
+-------------------------- */
+
+export function sendWaitingFromB() {
+  set(waitingRef, "userB");
+}
+
+/* -------------------------
+   CLEAR when released
+-------------------------- */
+
+export function clearWaiting() {
+  set(waitingRef, "");
+}

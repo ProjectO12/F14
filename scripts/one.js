@@ -1,46 +1,47 @@
-/*const cards = document.querySelectorAll(".rose-card");
+    const steps = document.querySelectorAll("#stepper .step");
 
-const observer = new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-        if(entry.isIntersecting){
-            entry.target.classList.add("show");
+    // Use local year automatically
+    const YEAR = new Date().getFullYear();
+
+    // Valentine week schedule (same order as your tracker)
+    const daySchedule = [
+        new Date(YEAR, 1, 7),  // one.html  – Rose
+        new Date(YEAR, 1, 8),  // two.html
+        new Date(YEAR, 1, 9),  // three.html
+        new Date(YEAR, 1, 10), // four.html
+        new Date(YEAR, 1, 11), // five.html
+        new Date(YEAR, 1, 12), // six.html
+        new Date(YEAR, 1, 14)  // seven.html
+    ];
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    steps.forEach((step, i) => {
+
+        const link = step.querySelector("a");
+        const circle = step.querySelector(".circle");
+
+        if(!link || !daySchedule[i]) return;
+
+        const dayDate = new Date(daySchedule[i]);
+        dayDate.setHours(0,0,0,0);
+
+        // completed day = strictly before today
+        if(dayDate <= today){
+            circle.classList.remove("disabled");
+            link.style.pointerEvents = "auto";
+            link.style.opacity = "1";
+
+        }else{
+
+            // today + future → disabled
+            link.style.pointerEvents = "none";
+            link.style.opacity = "0.35";
+            circle.classList.add("disabled");
+
         }
     });
-},{
-    threshold:0.6
-});
-
-cards.forEach(card=>{
-    observer.observe(card);
-});*/
-
-
-const cards = document.querySelectorAll(".rose-card");
-const dots  = document.querySelectorAll(".week-progress .dot");
-
-const observer = new IntersectionObserver((entries)=>{
-    entries.forEach(entry => {
-        if(entry.isIntersecting){
-
-            entry.target.classList.add("show");
-
-            const index = [...cards].indexOf(entry.target);
-
-            dots.forEach(d => d.classList.remove("active"));
-            if(dots[index]){
-                dots[index].classList.add("active");
-            }
-        }
-    });
-},{
-    threshold: 0.6
-});
-
-cards.forEach(card=>{
-    observer.observe(card);
-});
-
-const steps = document.querySelectorAll(".valentine-stepper .step");
 
 /*
 SET YOUR REAL DATES HERE
@@ -54,17 +55,6 @@ SET YOUR REAL DATES HERE
 5 -> Hug
 6 -> Valentine
 */
-
-const daySchedule = [
-    new Date("2026-02-03T00:00:00"), // Day 1 start
-    new Date("2026-02-04T00:00:00"), // Day 2 start
-    new Date("2026-02-09T00:00:00"),
-    new Date("2026-02-10T00:00:00"),
-    new Date("2026-02-11T00:00:00"),
-    new Date("2026-02-12T00:00:00"),
-    new Date("2026-02-13T00:00:00"),
-    new Date("2026-02-14T00:00:00")  // end boundary (needed for last calc)
-];
 
 function updateStepperByTime(){
 
@@ -111,3 +101,30 @@ function updateStepperByTime(){
 // update every minute
 updateStepperByTime();
 setInterval(updateStepperByTime, 60000);
+
+
+
+const cards = document.querySelectorAll(".rose-card");
+const dots  = document.querySelectorAll(".week-progress .dot");
+
+const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry => {
+        if(entry.isIntersecting){
+
+            entry.target.classList.add("show");
+
+            const index = [...cards].indexOf(entry.target);
+
+            dots.forEach(d => d.classList.remove("active"));
+            if(dots[index]){
+                dots[index].classList.add("active");
+            }
+        }
+    });
+},{
+    threshold: 0.6
+});
+
+cards.forEach(card=>{
+    observer.observe(card);
+});
