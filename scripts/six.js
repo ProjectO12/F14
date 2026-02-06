@@ -1,117 +1,145 @@
-window.__hug = {
-    myProgress: 0,
-    onBothHugged: null,
-    sendProgress: null
+const area   = document.getElementById("presenceArea");
+const dot    = document.getElementById("presenceDot");
+const hint   = document.getElementById("hint");
+const message= document.getElementById("message");
+
+/* bridge for firebase file */
+window.__presence = {
+    isHolding: false,
+    sendState: null,
+    onRemoteState: null
 };
 
-const hugArea = document.getElementById("hugArea");
-const you = document.getElementById("you");
-const her = document.getElementById("her");
-const message = document.getElementById("message");
-const hint = document.getElementById("hint");
-
-let holding = false;
-let progress = 0;
-let raf = null;
-
-const HOLD_TIME = 2500; // ms to complete the hug
+let myHolding = false;
+let otherHolding = false;
 
 function startHold(){
 
     if(message.classList.contains("show")) return;
 
-    holding = true;
-    let last = performance.now();
+    myHolding = true;
+    window.__presence.isHolding = true;
 
-    function step(now){
-
-        if(!holding){
-            raf = null;
-            return;
-        }
-
-        const delta = now - last;
-        last = now;
-
-        progress += delta;
-
-        const p = Math.min(1, progress / HOLD_TIME);
-
-        movePeople(p);
-        
-        window.__hug.myProgress = p;
-        window.__hug.sendProgress && window.__hug.sendProgress(p);
-
-
-        if(p >= 1){
-            holding = false;
-            return;
-        }
-
-        raf = requestAnimationFrame(step);
-    }
-
-    raf = requestAnimationFrame(step);
+    updateUI();
+    window.__presence.sendState && window.__presence.sendState(true);
 }
 
 function stopHold(){
 
     if(message.classList.contains("show")) return;
 
-    holding = false;
-    if(raf) cancelAnimationFrame(raf);
+    myHolding = false;
+    window.__presence.isHolding = false;
 
-    // soften the return
-    progress *= 0.5;
-    movePeople(progress / HOLD_TIME);
-    const p = Math.min(1, progress / HOLD_TIME);
-    window.__hug.myProgress = p;
-    window.__hug.sendProgress && window.__hug.sendProgress(p);
+    updateUI();
+    window.__presence.sendState && window.__presence.sendState(false);
+}
+
+function updateUI(){
+
+    dot.classList.remove("one","both");
+
+    if(myHolding || otherHolding){
+        dot.classList.add("one");
+    }
+
+    if(myHolding && otherHolding){
+        dot.classList.remove("one");
+        dot.classList.add("both");
+
+        hint.style.display = "none";
+        message.classList.add("show");
+    }
 
 }
 
-function movePeople(p){
+/* called by firebase file */
+window.__presence.onRemoteState = function(isHolding){
 
-    const areaWidth = hugArea.clientWidth;
-    const personWidth = you.offsetWidth;
+    otherHolding = isHolding;
+    updateUI();
+};
 
-    const minGap = 6;
-    const maxTravel =
-        (areaWidth - personWidth * 2 - minGap) / 2;
 
-    const move = maxTravel * p;
-
-    you.style.left = move + "px";
-    her.style.right = move + "px";
-
-    you.style.transform = `translateY(-50%) scale(${1 + p*0.05})`;
-    her.style.transform = `translateY(-50%) scale(${1 + p*0.05})`;
-}
-
-function finishHug(){
-
-    holding = false;
-
-    const gap = 6;
-    const center =
-        (hugArea.clientWidth - you.offsetWidth) / 2;
-
-    you.style.left = center - gap/2 + "px";
-    her.style.right = center - gap/2 + "px";
-
-    hint.style.display = "none";
-    message.classList.add("show");
-}
-
-/* mouse */
-hugArea.addEventListener("mousedown", startHold);
+/* input */
+area.addEventListener("mousedown", startHold);
 window.addEventListener("mouseup", stopHold);
 
-/* touch */
-hugArea.addEventListener("touchstart", e=>{
+area.addEventListener("touchstart", e=>{
     e.preventDefault();
     startHold();
 },{passive:false});
 
 window.addEventListener("touchend", stopHold);
-window.__hug.onBothHugged = finishHug;
+
+const steps = document.querySelectorAll(".valentine-stepper .step");
+
+/*
+SET YOUR REAL DATES HERE
+(India standard Valentine week – edit if needed)
+
+0 -> Rose
+1 -> Propose
+2 -> Chocolate
+3 -> Teddy
+4 -> Promise
+5 -> Hug
+6 -> Valentine
+*/
+
+const daySchedule = [
+    new Date("2026-02-03T00:00:00"), // Day 1 start
+    new Date("2026-02-04T00:00:00"), // Day 2 start
+    new Date("2026-02-09T00:00:00"),
+    new Date("2026-02-10T00:00:00"),
+    new Date("2026-02-11T00:00:00"),
+    new Date("2026-02-12T00:00:00"),
+    new Date("2026-02-13T00:00:00"),
+    new Date("2026-02-14T00:00:00")  // end boundary (needed for last calc)
+];
+
+function updateStepperByTime(){
+
+    const now = new Date();
+
+    steps.forEach((step, i) => {
+
+        const circle = step.querySelector(".circle");
+        const fill   = step.querySelector(".fill");
+
+        const start = daySchedule[i];
+        const end   = daySchedule[i + 1];
+
+        // future day
+        if(now < start){
+            circle.classList.remove("active");
+            if(fill) fill.style.width = "0%";
+            return;
+        }
+
+        // completed day
+        if(end && now >= end){
+            circle.classList.add("active");
+            if(fill) fill.style.width = "100%";
+            return;
+        }
+
+        // current running day
+        if(end && now >= start && now < end){
+
+            circle.classList.add("active");
+
+            const total = end.getTime() - start.getTime();
+            const passed = now.getTime() - start.getTime();
+
+            const percent = Math.min(100, Math.max(0, (passed / total) * 100));
+
+            if(fill) fill.style.width = percent + "%";
+        }
+
+    });
+}
+
+// update every minute
+updateStepperByTime();
+setInterval(updateStepperByTime, 60000);

@@ -152,6 +152,16 @@ body{
     border-color: #c94a6a;
 }
 
+.circle.active a{
+    color: white;
+    text-decoration: none;
+}
+
+.circle a{
+    color: #c94a6a;
+    text-decoration: none;
+}
+
 /* bar stretches automatically */
 .bar{
     flex: 1 1 auto;

@@ -18,7 +18,7 @@ body{
 
 .letter-card{
     width:100%;
-    max-width:420px;
+    max-width:60vw;
     background:white;
     border-radius:24px;
     padding:34px 26px 32px;
@@ -154,6 +154,16 @@ body{
     background: #c94a6a;
     color: #fff;
     border-color: #c94a6a;
+}
+
+.circle.active a{
+    color: white;
+    text-decoration: none;
+}
+
+.circle a{
+    color: #c94a6a;
+    text-decoration: none;
 }
 
 /* bar stretches automatically */

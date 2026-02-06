@@ -42,7 +42,7 @@ SET YOUR REAL DATES HERE
 const daySchedule = [
     new Date("2026-02-03T00:00:00"), // Day 1 start
     new Date("2026-02-04T00:00:00"), // Day 2 start
-    new Date("2026-02-09T00:00:00"),
+    new Date("2026-02-07T00:00:00"),
     new Date("2026-02-10T00:00:00"),
     new Date("2026-02-11T00:00:00"),
     new Date("2026-02-12T00:00:00"),

@@ -15,18 +15,13 @@ const firebaseConfig = {
 };
 
 
-const ROOM = "hug-room-1";
+const ROOM = "presence-room-1";
 
 /*
-  IMPORTANT:
-  on your device -> charan
-  on her device -> iswarya
+  your device  -> charan
+  her device   -> iswarya
 */
 const USER = "charan";
-
-/* ---------------------------
-   INIT
---------------------------- */
 
 const app  = initializeApp(firebaseConfig);
 const db   = getDatabase(app);
@@ -34,49 +29,33 @@ const auth = getAuth(app);
 
 await signInAnonymously(auth);
 
-const roomRef = ref(db, "hugRooms/" + ROOM);
+const roomRef = ref(db, "presenceRooms/" + ROOM);
 
-/* ---------------------------
-   hook from six.js
---------------------------- */
+/* send my state */
+window.__presence.sendState = function(isHolding){
 
-window.__hug.sendProgress = function(p){
-
-    update(roomRef, {
-        [USER]: p
+    update(roomRef,{
+        [USER]: isHolding
     });
-
 };
 
-/* ---------------------------
-   listen to other side
---------------------------- */
 
-let otherProgress = 0;
-
-onValue(roomRef, snap => {
+/* listen other side */
+onValue(roomRef, snap=>{
 
     const data = snap.val();
     if(!data) return;
 
+    let other;
+
     if(USER === "charan"){
-        otherProgress = data.iswarya || 0;
+        other = data.iswarya;
     }else{
-        otherProgress = data.charan || 0;
+        other = data.charan;
     }
 
-    checkBoth();
+    if(typeof other === "boolean"){
+        window.__presence.onRemoteState &&
+        window.__presence.onRemoteState(other);
+    }
 });
-
-
-function checkBoth(){
-
-    const my = window.__hug.myProgress || 0;
-
-    if(my >= 1 && otherProgress >= 1){
-
-        if(window.__hug.onBothHugged){
-            window.__hug.onBothHugged();
-        }
-    }
-}
