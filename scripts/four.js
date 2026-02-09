@@ -134,7 +134,6 @@ function startHold(){
 
     holding = true;
     teddy.classList.add("holding");
-    sendWaitingFromB();
 
     let last = performance.now();
 
@@ -169,7 +168,6 @@ function stopHold(){
 
     holding = false;
     teddy.classList.remove("holding");
-    clearWaiting();
 
     if(raf) cancelAnimationFrame(raf);
 
@@ -181,6 +179,7 @@ function stopHold(){
 function finishHug(){
     holding = false;
     teddy.classList.remove("holding");
+    sendWaitingFromB();
 
     hugFill.style.height = "100%";
     hint.style.display = "none";
@@ -213,7 +212,7 @@ const waitingRef = ref(db, "hugRoom/touched");
 -------------------------- */
 
 export function sendWaitingFromB() {
-  set(waitingRef, "userB");
+  set(waitingRef, Date.now());
 }
 
 /* -------------------------
